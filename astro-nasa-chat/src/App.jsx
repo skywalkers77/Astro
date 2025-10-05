@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Rocket, Upload, Image, Mic, MicOff, FileText, Database, Globe } from 'lucide-react';
+// Added 'Star' to the import line
+import { Send, Sparkles, Rocket, Upload, Image, Mic, MicOff, FileText, Database, Globe, Star } from 'lucide-react';
 
 const API_ENDPOINT = 'https://rag-ai-tutorial.hemanth3292.workers.dev/query';
 const TOP_K = 10;
@@ -40,6 +41,21 @@ const SaturnIcon = ({ size = 80, animate = true }) => (
       style={{ background: 'radial-gradient(circle, rgba(147, 51, 234, 0.4), transparent 70%)', animationDuration: '3s' }} />
   </div>
 );
+
+// ** MODIFICATION START **
+// New Footer Component from the provided reference
+const Footer = () => (
+    <div className="flex-shrink-0 pb-4 px-6">
+      <div className="max-w-5xl mx-auto text-center">
+        <p className="text-xs text-white/30 flex items-center justify-center gap-2">
+          <Star className="w-3 h-3" />
+          <span>Powered by Cloudflare AI • Google Gemini • Vector Search</span>
+          <Star className="w-3 h-3" />
+        </p>
+      </div>
+    </div>
+);
+// ** MODIFICATION END **
 
 // Component to display the sources for an AI message
 const SourcesDisplay = ({ sources }) => {
@@ -226,33 +242,49 @@ const LandingPage = ({ onStart }) => {
 };
 
 // Component for an individual chat message
-const ChatMessage = ({ message, isAI, timestamp, sources, mode, scoreThreshold }) => (
-  <div className={`flex ${isAI ? 'justify-start' : 'justify-end'} mb-6 animate-fadeIn`}>
-    <div className={`max-w-3xl relative group ${isAI ? 'mr-auto' : 'ml-auto'}`}>
-      <div className="px-6 py-4 rounded-3xl backdrop-blur-xl border shadow-2xl relative overflow-hidden" style={{
-          background: isAI ? 'linear-gradient(135deg, rgba(15, 15, 35, 0.85) 0%, rgba(88, 28, 135, 0.4) 30%, rgba(147, 51, 234, 0.3) 70%, rgba(15, 15, 35, 0.9) 100%)'
-            : 'linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(30, 58, 138, 0.5) 40%, rgba(59, 130, 246, 0.4) 70%, rgba(15, 15, 35, 0.95) 100%)',
-          borderColor: isAI ? 'rgba(147, 51, 234, 0.4)' : 'rgba(59, 130, 246, 0.4)',
-          borderRadius: isAI ? '24px 24px 24px 6px' : '24px 24px 6px 24px' }}>
-        <div className="relative flex items-start gap-3">
-          {isAI && (
-            <div className="flex flex-col items-center gap-1">
-              <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0 animate-pulse" />
-              {mode && (<div className="mt-2">{mode === 'augmented' ? <Globe className="w-3 h-3 text-cyan-400" title="Augmented with web search" />
-                  : <Database className="w-3 h-3 text-purple-400" title="Database search" />}</div>)}
+const ChatMessage = ({ message, isAI, timestamp, sources, mode }) => {
+    // Function to parse the message and convert **text** to <strong>text</strong>
+    const formatMessage = (text) => {
+        const boldedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        return boldedText;
+    };
+
+    return (
+        <div className={`flex ${isAI ? 'justify-start' : 'justify-end'} mb-6 animate-fadeIn`}>
+            <div className={`max-w-3xl relative group ${isAI ? 'mr-auto' : 'ml-auto'}`}>
+                <div className="px-6 py-4 rounded-3xl backdrop-blur-xl border shadow-2xl relative overflow-hidden" style={{
+                    background: isAI ? 'linear-gradient(135deg, rgba(15, 15, 35, 0.85) 0%, rgba(88, 28, 135, 0.4) 30%, rgba(147, 51, 234, 0.3) 70%, rgba(15, 15, 35, 0.9) 100%)'
+                        : 'linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(30, 58, 138, 0.5) 40%, rgba(59, 130, 246, 0.4) 70%, rgba(15, 15, 35, 0.95) 100%)',
+                    borderColor: isAI ? 'rgba(147, 51, 234, 0.4)' : 'rgba(59, 130, 246, 0.4)',
+                    borderRadius: isAI ? '24px 24px 24px 6px' : '24px 24px 6px 24px'
+                }}>
+                    <div className="relative flex items-start gap-3">
+                        {isAI && (
+                            <div className="flex flex-col items-center gap-1">
+                                <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0 animate-pulse" />
+                                {mode && (
+                                    <div className="mt-2">
+                                        {mode === 'augmented' ? <Globe className="w-3 h-3 text-cyan-400" title="Augmented with web search" />
+                                            : <Database className="w-3 h-3 text-purple-400" title="Database search" />}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <div className="flex-1">
+                            <p
+                                className="text-white/90 leading-relaxed text-base whitespace-pre-wrap"
+                                dangerouslySetInnerHTML={{ __html: formatMessage(message) }}
+                            />
+                            <span className="text-xs text-white/40 mt-2 block">{timestamp}</span>
+                        </div>
+                    </div>
+                    {isAI && <div className="absolute -top-1 -left-1 w-2 h-2 bg-purple-400 rounded-full animate-ping" />}
+                </div>
+                {isAI && sources && <SourcesDisplay sources={sources} />}
             </div>
-          )}
-          <div className="flex-1">
-            <p className="text-white/90 leading-relaxed text-base whitespace-pre-wrap">{message}</p>
-            <span className="text-xs text-white/40 mt-2 block">{timestamp}</span>
-          </div>
         </div>
-        {isAI && <div className="absolute -top-1 -left-1 w-2 h-2 bg-purple-400 rounded-full animate-ping" />}
-      </div>
-      {isAI && sources && <SourcesDisplay sources={sources} />}
-    </div>
-  </div>
-);
+    );
+};
 
 // The main chat interface component
 const ChatInterface = ({ messages, isTyping, onSendMessage, messagesEndRef }) => {
@@ -338,7 +370,7 @@ const ChatInterface = ({ messages, isTyping, onSendMessage, messagesEndRef }) =>
       <div className="flex-1 overflow-y-auto px-6 py-8">
         <div className="max-w-5xl mx-auto">
           {messages.map((message) => (<ChatMessage key={message.id} message={message.text} isAI={message.isAI}
-              timestamp={message.timestamp} sources={message.sources} mode={message.mode} />))}
+            timestamp={message.timestamp} sources={message.sources} mode={message.mode} />))}
           {isTyping && (
             <div className="flex justify-start mb-6 animate-fadeIn">
               <div className="flex items-center gap-3">
@@ -349,7 +381,7 @@ const ChatInterface = ({ messages, isTyping, onSendMessage, messagesEndRef }) =>
                     background: 'linear-gradient(135deg, rgba(15, 15, 35, 0.85) 0%, rgba(88, 28, 135, 0.4) 30%, rgba(147, 51, 234, 0.3) 70%, rgba(15, 15, 35, 0.9) 100%)' }}>
                   <div className="flex gap-1">
                     {[0, 1, 2].map((i) => (<div key={i} className="w-2 h-2 bg-purple-300 rounded-full animate-bounce"
-                        style={{ animationDelay: `${i * 0.2}s` }} />))}
+                      style={{ animationDelay: `${i * 0.2}s` }} />))}
                   </div>
                 </div>
               </div>
@@ -423,120 +455,120 @@ const ChatInterface = ({ messages, isTyping, onSendMessage, messagesEndRef }) =>
           </div>
         </div>
       </div>
+      {/* ** MODIFICATION START ** */}
+      {/* Replaced the old footer tag with the new Footer component call */}
+      <Footer />
+      {/* ** MODIFICATION END ** */}
     </div>
   );
 };
 
 // Main App component to manage state and logic
 const App = () => {
-  const [hasStarted, setHasStarted] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-  useEffect(scrollToBottom, [messages, isTyping]);
+  useEffect(scrollToBottom, [messages, isTyping]);
 
-  const handleSendMessage = async (text, augmented) => {
-    const userMessage = {
-      id: Date.now(),
-      text,
-      isAI: false,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
+  const handleSendMessage = async (text, augmented) => {
+    const userMessage = {
+      id: Date.now(),
+      text,
+      isAI: false,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
 
-    setMessages(prev => [...prev, userMessage]);
-    setIsTyping(true);
+    setMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
 
-    try {
-      const params = new URLSearchParams({
-        text: text,
-        top_k: TOP_K.toString(), // Ensure top_k is a string
-        mode: augmented ? 'hybrid' : 'db-only',
-        scoreThreshold: SCORE_THRESHOLD.toString(), // Ensure scoreThreshold is a string
-      });
+    try {
+      const params = new URLSearchParams({
+        text: text,
+        top_k: TOP_K.toString(),
+        mode: augmented ? 'hybrid' : 'db-only',
+        scoreThreshold: SCORE_THRESHOLD.toString(),
+      });
 
-      const urlWithParams = `${API_ENDPOINT}?${params.toString()}`;
-      const response = await fetch(urlWithParams);
+      const urlWithParams = `${API_ENDPOINT}?${params.toString()}`;
+      
+      const response = await fetch(urlWithParams);
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
-      }
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
 
-      const data = await response.json();
-      
-      // ** MODIFICATION START **
-      // Filter for unique sources, keeping the one with the highest score.
+      const data = await response.json();
+      
       const uniqueSourcesMap = data.sources.reduce((acc, currentSource) => {
         const existingSource = acc.get(currentSource.source);
-        // If the source isn't in the map or the current one has a higher score, update it.
         if (!existingSource || currentSource.score > existingSource.score) {
           acc.set(currentSource.source, currentSource);
         }
         return acc;
       }, new Map());
 
-      // Convert the map values back to an array of unique source objects.
       const uniqueSources = Array.from(uniqueSourcesMap.values());
-      // ** MODIFICATION END **
 
-      const sources = uniqueSources.map(s => { // Use the filtered 'uniqueSources' array
-        let relevance;
-        if (s.score > SCORE_THRESHOLD) relevance = 'High';
-        else if (s.score > SCORE_THRESHOLD - 0.1) relevance = 'Medium';
-        else relevance = 'Low';
-        return { ...s, relevance };
-      });
+      const sources = uniqueSources.map(s => {
+        let relevance;
+        if (s.score > SCORE_THRESHOLD) relevance = 'High';
+        else if (s.score > SCORE_THRESHOLD - 0.1) relevance = 'Medium';
+        else relevance = 'Low';
+        return { ...s, relevance };
+      });
 
-      const aiMessage = {
-        id: Date.now() + 1,
-        text: data.answer.trim(),
-        isAI: true,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        sources: sources, // This now contains only unique sources
-        mode: augmented ? 'hybrid' : 'db-only',
-      };
-      setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-      console.error('Failed to fetch AI response:', error);
-      const errorMessage = {
-        id: Date.now() + 1,
-        text: `I'm sorry, but I encountered an error: ${error.message}. Please check the API endpoint and try again.`,
-        isAI: true,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        sources: [],
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsTyping(false);
-    }
-  };
+      const aiMessage = {
+        id: Date.now() + 1,
+        text: data.answer.trim(),
+        isAI: true,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        sources: sources,
+        mode: augmented ? 'hybrid' : 'db-only',
+      };
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Failed to fetch AI response:', error);
+      const errorMessage = {
+        id: Date.now() + 1,
+        text: `I'm sorry, but I encountered an error: ${error.message}. Please check the API endpoint and try again.`,
+        isAI: true,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        sources: [],
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
-  const handleStartChat = (text, augmented) => {
-    setHasStarted(true);
-    handleSendMessage(text, augmented);
-  };
-  
-  return (
-    <div className="bg-[#0f0f23] text-white font-sans">
-      <StarField />
-      <div className="relative z-10">
-        {!hasStarted ? (
-          <LandingPage onStart={handleStartChat} />
-        ) : (
-          <ChatInterface
-            messages={messages}
-            isTyping={isTyping}
-            onSendMessage={handleSendMessage}
-            messagesEndRef={messagesEndRef}
-          />
-        )}
-      </div>
-    </div>
-  );
+  const handleStartChat = (text, augmented) => {
+    setHasStarted(true);
+    handleSendMessage(text, augmented);
+  };
+  
+  return (
+    <div className="bg-[#0f0f23] text-white font-sans">
+      <StarField />
+      <div className="relative z-10">
+        {!hasStarted ? (
+          <LandingPage onStart={handleStartChat} />
+        ) : (
+          <ChatInterface
+            messages={messages}
+            isTyping={isTyping}
+            onSendMessage={handleSendMessage}
+            messagesEndRef={messagesEndRef}
+          />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default App;
