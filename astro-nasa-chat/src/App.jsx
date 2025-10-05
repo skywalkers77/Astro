@@ -56,7 +56,7 @@ const Footer = () => (
     </div>
 );
 // ** MODIFICATION END **
-
+//SourceDisplay
 // Component to display the sources for an AI message
 const SourcesDisplay = ({ sources }) => {
   if (!sources || sources.length === 0) return null;
