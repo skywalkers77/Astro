@@ -22,7 +22,7 @@ The user journey starts with a visually stunning, animated landing page and tran
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React.js (with Hooks)
+- **Frontend**: React.js (with Hooks), **Vite*
 - **Styling**: Tailwind CSS
 - **Icons**: Lucide React
 - **Language**: JavaScript (ES6+) & JSX
