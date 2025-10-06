@@ -1,4 +1,4 @@
-# 🚀 ASTRO - AI Research Engine
+# 🚀 AstroRAG
 
 ASTRO is a futuristic, space-themed web application serving as a front-end for a Retrieval-Augmented Generation (RAG) AI. It enables users to query a specialized knowledge base—NASA bioscience research—and receive AI-generated answers grounded in source documents.
 
@@ -31,16 +31,29 @@ The user journey starts with a visually stunning, animated landing page and tran
 
 ## ⚙️ Setup and Installation
 
-To run the project locally:
+To run ASTRO locally, follow these steps:
 
-```bash
-git clone https://github.com/your-username/astro-ai-research-engine.git
-cd astro-ai-research-engine
-npm install
-npm start
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/astro-ai-research-engine.git
+   ```
 
-The app will run at [http://localhost:3000](http://localhost:3000).
+2. **Navigate to the project directory:**
+   ```bash
+   cd astro-ai-research-engine
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+4. **Start the development server:**
+   ```bash
+   npm start
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to use the application.
 
 ---
 
@@ -74,3 +87,5 @@ The frontend communicates with a backend service via GET requests:
 - `mode` (string): One of:
   - `'db-only'`: Search internal knowledge base only
   - `'hybrid'`: Augment search with external web results
+
+---
